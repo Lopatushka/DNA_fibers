@@ -33,15 +33,17 @@ def main():
     input_dir = IJ.getDirectory("Choose a directory with files")
     
     for filename in os.listdir(input_dir):
-        if filename.lower().endswith((".czi")):
+        if filename.lower().endswith(".czi"):
             path = os.path.join(input_dir, filename)
-            imps = BF.openImagePlus(path)
-            if imps is None:
-                IJ.log("Could not open: {}".format(path))
+            try:
+                imps = BF.openImagePlus(path)
+            except Exception as e:
+                IJ.log("Error opening {}: {}".format(path, e))
                 continue
             
             for imp in imps:
-                imp.show()
+                if imp is not None:
+                    imp.show()
     
     # Check if at least one image is opened
     ids = WindowManager.getIDList()
@@ -114,7 +116,7 @@ def main():
         ce = ContrastEnhancer()
         
         # channel 1, red
-        ce.stretchHistogram(c1, 0.55)
+        ce.stretchHistogram(c1, 0.65)
         c1.updateAndDraw()
         
         # channel 2, green
