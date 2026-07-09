@@ -38,6 +38,12 @@ def main():
         IJ.error("No suitable images found (only derived windows are open)!")
         return
     
+    # Ask user where to save outputs
+    output_dir = IJ.getDirectory("Choose a directory to save data")
+    if output_dir is None:
+        IJ.error("No output directory is selected!")
+        return
+    
     # Keep only unique images
     unique_images = sorted(list(set(images)))
     n = len(unique_images) # total amount of images to process
@@ -93,7 +99,10 @@ def main():
     ce.stretchHistogram(c3, 0.35)
     c3.updateAndDraw()
     
-    # --- Show splitted images in FIJI --- 
+    # --- Changes names of splitted images ---
+    c1.setTitle("{}_fibers1_red".format(imp_name))
+    c2.setTitle("{}_fibers1_green".format(imp_name))
+    
     c3.setTitle("{}_chromatin".format(imp_name))
     c3.show()
     #for i, ch in enumerate(channels, start=1):
@@ -106,6 +115,12 @@ def main():
 
     rgb.setTitle("{}_merged".format(imp_name))
     rgb.show()
+    
+    # ave dataCreate new directory for each image and save data
+    new_dir = os.path.join(output_dir, imp_name)
+    if not os.path.exists(new_dir):
+        os.makedirs(new_dir)
+
     
     
 
