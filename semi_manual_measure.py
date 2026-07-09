@@ -136,6 +136,10 @@ def main():
             # Show results table and run measurement command
             rt = ResultsTable.getResultsTable()
             rm.runCommand(imp_1, "Measure")
+            
+            # Add column
+            for row in range(rt.size()):
+                rt.setValue("Measurement_type", row, measurement_type.replace(" ", "_"))
                 
             if rt.size() > 0:
                 name = os.path.basename(root)
