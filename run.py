@@ -123,11 +123,34 @@ def main():
             
         # Put C1 into the red channel and C2 into the green channel
         rgb = RGBStackMerge.mergeChannels([c1, c2, None, None, None, None, None], False)
+        
         # Convert Composite/Stack -> RGB
         ImageConverter(rgb).convertToRGB()
+        
+        # IMPORTANT: restore calibration
+        rgb.setCalibration(imp.getCalibration().copy())
 
+        # Set name for merged image
         rgb.setTitle("{}_merged".format(imp_name))
-        #rgb.show()
+        
+        # --- Add scale bar to the rgb and chromatim images ---
+        # copy images
+        rgb_copy = rgb.duplicate()
+        rgb_copy.setTitle(rgb.getTitle() + "_ruler")
+        
+        c3_copy = c3.duplicate()
+        c3_copy.setTitle(c3.getTitle() + "_ruler")
+        
+        IJ.run(
+        rgb_copy,
+        "Scale Bar...",
+        "width=20 height=4 font=18 color=White background=None location=[Lower Right] bold overlay"
+        )
+        IJ.run(
+        c3_copy,
+        "Scale Bar...",
+        "width=20 height=4 font=18 color=White background=None location=[Lower Right] bold overlay"
+        )
         
         # Create new directory for each image and save data
         save_dir = os.path.join(output_dir, imp_name)
@@ -138,17 +161,24 @@ def main():
         save_imp(c1, "png", save_dir)
         save_imp(c2, "png", save_dir)
         save_imp(c3, "png", save_dir)
+        
+        save_imp(rgb_copy, "png", save_dir)
+        save_imp(c3_copy, "png", save_dir)
 
         IJ.log("Images are saved in {}".format(save_dir))
         
+        # Check calibration of the images
+        for img in [c1, rgb]:
+            cal = img.getCalibration()
+            print(img.getTitle())
+            print("pixelWidth:", cal.pixelWidth)
+            print("pixelHeight:", cal.pixelHeight)
+            print("unit:", cal.getUnit())
+            
 
     # Close all opened images
     for wid in WindowManager.getIDList() or []:
         WindowManager.getImage(wid).close()
-
-    # Check what images are opened
-    #ids = WindowManager.getIDList() or []
-    #print("Open images:", len(ids))
     
     
 
