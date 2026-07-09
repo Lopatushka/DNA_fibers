@@ -1,5 +1,6 @@
 from ij import IJ, WindowManager
 from loci.plugins import BF
+from loci.formats import FormatException
 from ij.plugin import ChannelSplitter, ContrastEnhancer, RGBStackMerge
 from ij.process import ImageConverter
 import os
@@ -41,7 +42,7 @@ def main():
         
         try:
             imps = BF.openImagePlus(path)
-        except BaseException as e:
+        except FormatException as e:
             IJ.log("FAILED opening: {}".format(path))
             IJ.log("Error: {}".format(e))
             continue
