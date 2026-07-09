@@ -158,6 +158,12 @@ def main():
         # Close images only after user skips/cancels this image pair
         close_image(imp_1)
         close_image(imp_2)
+    
+    # Clear ROI Manager and Results table at the end
+    clear_results_and_rois()
+    
+    IJ.log("Done!")
+    
         
 if __name__ == "__main__":
     main()
