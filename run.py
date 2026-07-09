@@ -2,8 +2,6 @@ from ij import IJ, WindowManager
 from ij.plugin import ChannelSplitter, ContrastEnhancer, RGBStackMerge
 from ij.process import ImageConverter
 import os
-import csv
-import traceback
 
 
 def save_imp(imp, ext, dir):
@@ -30,6 +28,16 @@ def save_imp(imp, ext, dir):
 # MAIN FUNCTION
 # ---------------------------------
 def main():
+    # Open all files in the directory selected by the user
+    input_dir = IJ.getDirectory("Choose a directory with files")
+    
+    for filename in os.listdir(input_dir):
+        if filename.lower().endswith((".czi")):
+            path = os.path.join(input_dir, filename)
+            imp = IJ.openImage(path)
+            if imp is None:
+                continue
+    
     # Check if at least one image is opened
     ids = WindowManager.getIDList()
     if not ids:
