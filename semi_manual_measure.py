@@ -153,7 +153,7 @@ def main():
     # Close ROI Manager
     rm = RoiManager.getInstance()
     if rm is not None:
-        rm.close()
+        rm.runCommand("Close")
         
 if __name__ == "__main__":
     main()
