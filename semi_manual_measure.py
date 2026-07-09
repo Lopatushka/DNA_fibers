@@ -152,8 +152,13 @@ def main():
         close_image(imp_2)
         
     # After analysis is complete, close Roi Manager and Results Table
-    rt.close()
-    rm.close()
+    results = WindowManager.getWindow("Results")
+    if results is not None:
+        results.close()
+
+    # Close ROI Manager
+    if rm is not None:
+        rm.close()
         
 if __name__ == "__main__":
     main()
