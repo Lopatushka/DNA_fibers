@@ -39,6 +39,31 @@ def main():
     # Keep only unique images
     unique_images = sorted(list(set(images)))
     n = len(unique_images) # total amount of images to process
+    
+    # TEST CODE: 1 image
+    #  Take pixel size 
+    #imp = unique_images[0]
+    
+    for call_id, imp in enumerate(unique_images, start=1):
+        # Make Log message
+        msg = "Processing image {}/{}: {}".format(
+            call_id,
+            n,
+            imp.getTitle()
+        )
+        IJ.log(msg)
+        
+        cal = imp.getCalibration()
+        if cal.scaled():
+            IJ.log("Image is calibrated.")
+
+    #pixel_width = cal.pixelWidth
+    #pixel_height = cal.pixelHeight
+    #pixel_depth = cal.pixelDepth
+
+    #unit = cal.getUnit()
+
+    #print(pixel_width, pixel_height, pixel_depth, unit)
 
 
 if __name__ == "__main__":
