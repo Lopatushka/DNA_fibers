@@ -1,4 +1,5 @@
 from ij import IJ, WindowManager
+from loci.plugins import BF
 from ij.plugin import ChannelSplitter, ContrastEnhancer, RGBStackMerge
 from ij.process import ImageConverter
 import os
@@ -34,9 +35,13 @@ def main():
     for filename in os.listdir(input_dir):
         if filename.lower().endswith((".czi")):
             path = os.path.join(input_dir, filename)
-            imp = IJ.openImage(path)
-            if imp is None:
+            imps = BF.openImagePlus(path)
+            if imps is None:
+                IJ.log("Could not open: {}".format(path))
                 continue
+            
+            for imp in imps:
+                imp.show()
     
     # Check if at least one image is opened
     ids = WindowManager.getIDList()
