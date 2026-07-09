@@ -33,17 +33,22 @@ def main():
     input_dir = IJ.getDirectory("Choose a directory with files")
     
     for filename in os.listdir(input_dir):
-        if filename.lower().endswith(".czi"):
-            path = os.path.join(input_dir, filename)
-            try:
-                imps = BF.openImagePlus(path)
-            except Exception as e:
-                IJ.log("Error opening {}: {}".format(path, e))
-                continue
+        if not filename.lower().endswith(".czi"):
+            continue
+        
+        path = os.path.join(input_dir, filename)
+        IJ.log("Trying to open: {}".format(path))
+        
+        try:
+            imps = BF.openImagePlus(path)
+        except BaseException as e:
+            IJ.log("FAILED opening: {}".format(path))
+            IJ.log("Error: {}".format(e))
+            continue
             
-            for imp in imps:
-                if imp is not None:
-                    imp.show()
+        for imp in imps:
+            if imp is not None:
+                imp.show()
     
     # Check if at least one image is opened
     ids = WindowManager.getIDList()
