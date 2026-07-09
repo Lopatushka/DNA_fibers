@@ -46,7 +46,7 @@ def main():
     # Iterate through all unique images
     # ---------------------------------
     for call_id, imp in enumerate(unique_images, start=1):
-        imp_name = imp.getTitle()
+        imp_name = imp.getTitle().split(".")[0] # get image name without extension
         # Make Log message
         msg = "Processing image {}/{}: {}".format(
             call_id,
