@@ -166,14 +166,6 @@ def main():
         save_imp(c3_copy, "png", save_dir)
 
         IJ.log("Images are saved in {}".format(save_dir))
-        
-        # Check calibration of the images
-        for img in [c1, rgb]:
-            cal = img.getCalibration()
-            print(img.getTitle())
-            print("pixelWidth:", cal.pixelWidth)
-            print("pixelHeight:", cal.pixelHeight)
-            print("unit:", cal.getUnit())
             
 
     # Close all opened images
