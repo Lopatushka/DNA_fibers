@@ -1,18 +1,30 @@
 from ij import IJ, WindowManager
 from ij.plugin import ChannelSplitter, ContrastEnhancer, RGBStackMerge
 from ij.process import ImageConverter
-from ij.gui import GenericDialog
-from ij.plugin.frame import RoiManager
-from ij.gui import ShapeRoi
-from ij.plugin.filter import BackgroundSubtracter
-from ij.measure import Measurements, ResultsTable
-from ij.process import ImageStatistics
-from ij.gui import NonBlockingGenericDialog
-from ij.gui import WaitForUserDialog
-from ij.plugin.filter import Analyzer
 import os
 import csv
 import traceback
+
+
+def save_imp(imp, ext, dir):
+    """
+    Save the image in the specified format and directory.
+    
+    Parameters:
+        imp (ImagePlus): The image to save.
+        ext (str): The file extension (e.g., 'tif', 'png').
+        dir (str): The directory where the image will be saved.
+    """
+    # Construct the full path for saving
+    save_path = os.path.join(dir, "{}.{}".format(imp.getTitle(), ext))
+    
+    # Save the image based on the specified extension
+    if ext.lower() == "tif":
+        IJ.saveAs(imp, "Tiff", save_path)
+    elif ext.lower() == "png":
+        IJ.saveAs(imp, "PNG", save_path)
+    else:
+        IJ.error("Unsupported file format: {}".format(ext))
 
 # ---------------------------------
 # MAIN FUNCTION
@@ -116,12 +128,16 @@ def main():
     rgb.setTitle("{}_merged".format(imp_name))
     rgb.show()
     
-    # ave dataCreate new directory for each image and save data
-    new_dir = os.path.join(output_dir, imp_name)
-    if not os.path.exists(new_dir):
-        os.makedirs(new_dir)
-
+    # Create new directory for each image and save data
+    save_dir = os.path.join(output_dir, imp_name)
+    os.makedirs(save_dir, exist_ok=True)
     
+    save_imp(rgb, "png", save_dir)
+    save_imp(c1, "png", save_dir)
+    save_imp(c2, "png", save_dir)
+    save_imp(c3, "png", save_dir)
+
+    IJ.log("Images are saved in {}".format(save_dir))
     
 
 if __name__ == "__main__":
