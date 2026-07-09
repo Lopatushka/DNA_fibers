@@ -61,17 +61,17 @@ def main():
                 gd.showDialog()
 
                 if gd.wasCanceled():
-                    measurement_type = "Skip this image pair"
+                    measurement_type = "Skip this image"
                 else:
                     measurement_type = gd.getNextChoice()
 
                 # Skip pair and go to next folder
-                if measurement_type == "Skip this image pair":
+                if measurement_type == "Skip this image":
                     IJ.log("Skipped image pair: {}".format(root))
                     break
             
                 # Stop analysis
-                if measurement_type == "Stop analysis:":
+                if measurement_type == "Stop analysis":
                     IJ.log("Analysis stopped by user.")
                     return
             
