@@ -44,6 +44,7 @@ def main():
     substring_2 = "_chromatin.png"
     
     # --- Iteration ---
+    n_files = 0
     for root, dirs, files in os.walk(input_dir):
         
         path_1 = None
@@ -64,8 +65,9 @@ def main():
         # process only folders where both files were found
         if path_1 is None or path_2 is None:
             continue
-
-        IJ.log("Opening files: {} and {}".format(path_1, path_2))
+        
+        # Open the two images
+        #IJ.log("Opening files: {} and {}".format(path_1, path_2))
 
         imp_1 = IJ.openImage(path_1)
         imp_2 = IJ.openImage(path_2)
@@ -73,6 +75,9 @@ def main():
         if imp_1 is None or imp_2 is None:
             IJ.log("Cannot open images.")
             continue
+        
+        n_files += 1
+        IJ.log("Processing image pair {}: {}".format(n_files, root))
         
         imp_1.show()
         imp_2.show()
