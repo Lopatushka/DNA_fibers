@@ -1,4 +1,5 @@
 from ij import IJ, WindowManager
+from ij.plugin import ChannelSplitter
 from ij.gui import GenericDialog
 from ij.plugin.frame import RoiManager
 from ij.gui import ShapeRoi
@@ -44,6 +45,9 @@ def main():
     #  Take pixel size 
     #imp = unique_images[0]
     
+    # ---------------------------------
+    # Iterate through all unique images
+    # ---------------------------------
     for call_id, imp in enumerate(unique_images, start=1):
         # Make Log message
         msg = "Processing image {}/{}: {}".format(
@@ -65,7 +69,14 @@ def main():
             pixel_height,
             unit
             ))
-
+    
+    # Split image and acess them individually    
+    channels = ChannelSplitter.split(imp)
+    c1 = channels[0] # fibers 1
+    c2 = channels[1] # fibers 1
+    c3 = channels[2] # chromatin
+    
+    
 
 if __name__ == "__main__":
     main()
