@@ -42,35 +42,45 @@ def main():
             if imp_2 is not None:
                 imp_2.show()
                 
-            # Clear previous measurements
-            IJ.run("Clear Results")
-            
-            # Ask what will be measured
-            gd = GenericDialog("Measurement type")
-            gd.addChoice(
-                "Measure:",
-                ["Fiber length", "Interorigin distance"],
-                "Fiber length"
-            )
+            # Repeat measurements for the same image pair
+            while True:
 
-            gd.showDialog()
+                # Clear previous measurements
+                IJ.run("Clear Results")
+            
+                # Ask what will be measured
+                gd = GenericDialog("Measurement type")
+                gd.addChoice(
+                    "Measure:",
+                    ["Fiber length", "Interorigin distance", "Skip this image", "Stop analysis"],
+                    "Fiber length"
+                )
+
+                gd.showDialog()
 
             if gd.wasCanceled():
-                # User cancelled -> skip this image pair
-                if imp_1 is not None:
-                    imp_1.close()
-                if imp_2 is not None:
-                    imp_2.close()
-                continue
+                measurement_type = "Skip this image pair"
+            else:
+                measurement_type = gd.getNextChoice()
 
-            measurement_type = gd.getNextChoice()
+            # Skip pair and go to next folder
+            if measurement_type == "Skip this image pair":
+                IJ.log("Skipped image pair: {}".format(root))
+                break
+            
+            # Stop analysis
+            if measurement_type == "Stop analysis:":
+                IJ.log("Analysis stopped by user.")
+                return
             
             # Wait for user
             WaitForUserDialog(
                 "Manual measurements",
-                "Make your measurements now.\n\n"
-                "Click OK to save results and continue.\n"
-                "If you want to skip this image, do not measure anything and click OK."
+                "Measure: {}\n\n"
+                "Click OK to save these results.\n"
+                "You will then be asked again for another measurement type.".format(
+                    measurement_type
+                )
             ).show()
             
             # Save Results table
@@ -83,9 +93,12 @@ def main():
                 rt.save(save_path)
                 IJ.log("Saved {} measurements: {}".format(measurement_type, save_path))
             else:
-                IJ.log("Skipped: no measurements for {}".format(root))
+                IJ.log("No measurements made for {} in {}".format(
+                    measurement_type,
+                    root
+                ))
 
-        # Close images
+       # Close images only after user skips/cancels this image pair
         if imp_1 is not None:
             imp_1.close()
 
