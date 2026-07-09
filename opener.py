@@ -1,5 +1,5 @@
 from ij import IJ
-from ij.gui import WaitForUserDialog
+from ij.gui import WaitForUserDialog, GenericDialog
 from ij.measure import ResultsTable
 import os
 
@@ -44,6 +44,26 @@ def main():
                 
             # Clear previous measurements
             IJ.run("Clear Results")
+            
+            # Ask what will be measured
+            gd = GenericDialog("Measurement type")
+            gd.addChoice(
+                "Measure:",
+                ["Fiber length", "Interorigin distance"],
+                "Fiber length"
+            )
+
+            gd.showDialog()
+
+            if gd.wasCanceled():
+                # User cancelled -> skip this image pair
+                if imp_1 is not None:
+                    imp_1.close()
+                if imp_2 is not None:
+                    imp_2.close()
+                continue
+
+            measurement_type = gd.getNextChoice()
             
             # Wait for user
             WaitForUserDialog(
