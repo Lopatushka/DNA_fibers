@@ -1,5 +1,5 @@
 from ij import IJ, WindowManager
-from ij.plugin import ChannelSplitter
+from ij.plugin import ChannelSplitter, ContrastEnhancer
 from ij.gui import GenericDialog
 from ij.plugin.frame import RoiManager
 from ij.gui import ShapeRoi
@@ -41,10 +41,6 @@ def main():
     unique_images = sorted(list(set(images)))
     n = len(unique_images) # total amount of images to process
     
-    # TEST CODE: 1 image
-    #  Take pixel size 
-    #imp = unique_images[0]
-    
     # ---------------------------------
     # Iterate through all unique images
     # ---------------------------------
@@ -69,12 +65,35 @@ def main():
             pixel_height,
             unit
             ))
-    
+        
     # Split image and acess them individually    
     channels = ChannelSplitter.split(imp)
-    c1 = channels[0] # fibers 1
-    c2 = channels[1] # fibers 1
+    c1 = channels[0] # fibers 1, red
+    c2 = channels[1] # fibers 1, green
     c3 = channels[2] # chromatin
+    
+    # --- Adjust LUT ---
+    c3.setActivated()
+    IJ.run(c3, "Grays", "")
+    
+    # --- Automatic brightness/contrast ---
+    ce = ContrastEnhancer()
+    
+    # channel 1, red
+    ce.stretchHistogram(c1, 0.55)
+    c1.updateAndDraw()
+    
+    # channel 2, green
+    ce.stretchHistogram(c2, 0.65)
+    c2.updateAndDraw()
+    
+    # channel 3, grey
+    ce.stretchHistogram(c3, 0.35)
+    c3.updateAndDraw()
+
+    # Show splitted images in FIJI
+    for i, ch in enumerate(channels, start=1):
+        ch.show()
     
     
 
