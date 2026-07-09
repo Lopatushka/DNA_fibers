@@ -91,20 +91,20 @@ def main():
                         )
                     ).show()
             
-                # Save Results table
-                rt = ResultsTable.getResultsTable()
+                    # Save Results table
+                    rt = ResultsTable.getResultsTable()
                 
-                if rt.size() > 0:
-                    folder_name = os.path.basename(root)
-                    save_path = os.path.join(root, folder_name + "_" + measurement_type + ".csv")
+                    if rt.size() > 0:
+                        folder_name = os.path.basename(root)
+                        save_path = os.path.join(root, folder_name + "_" + measurement_type + ".csv")
 
-                    rt.save(save_path)
-                    IJ.log("Saved {} measurements: {}".format(measurement_type, save_path))
-                else:
-                    IJ.log("No measurements made for {} in {}".format(
-                        measurement_type,
-                        root
-                    ))
+                        rt.save(save_path)
+                        IJ.log("Saved {} measurements: {}".format(measurement_type, save_path))
+                    else:
+                        IJ.log("No measurements made for {} in {}".format(
+                            measurement_type,
+                            root
+                        ))
 
         # Close images only after user skips/cancels this image pair
             if imp_1 is not None:
