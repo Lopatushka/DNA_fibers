@@ -1,5 +1,6 @@
 from ij import IJ, WindowManager
-from ij.plugin import ChannelSplitter, ContrastEnhancer
+from ij.plugin import ChannelSplitter, ContrastEnhancer, RGBStackMerge
+from ij.process import ImageConverter
 from ij.gui import GenericDialog
 from ij.plugin.frame import RoiManager
 from ij.gui import ShapeRoi
@@ -90,10 +91,19 @@ def main():
     # channel 3, grey
     ce.stretchHistogram(c3, 0.35)
     c3.updateAndDraw()
+    
 
-    # Show splitted images in FIJI
+    # --- Show splitted images in FIJI --- 
     for i, ch in enumerate(channels, start=1):
         ch.show()
+        
+    # Put C1 into the red channel and C2 into the green channel
+    rgb = RGBStackMerge.mergeChannels([c1, c2, None, None, None, None, None], False)
+    # Convert Composite/Stack -> RGB
+    ImageConverter(rgb).convertToRGB()
+
+    rgb.setTitle("Merged")
+    rgb.show()
     
     
 
