@@ -141,14 +141,14 @@ def main():
 
         IJ.log("Images are saved in {}".format(save_dir))
         
-        # Close images
-        for ch in channels:
-            ch.close()
-        rgb.close()
+
+    # Close all opened images
+    for wid in WindowManager.getIDList() or []:
+        WindowManager.getImage(wid).close()
 
     # Check what images are opened
-    ids = WindowManager.getIDList() or []
-    print("Open images:", len(ids))
+    #ids = WindowManager.getIDList() or []
+    #print("Open images:", len(ids))
     
     
 
