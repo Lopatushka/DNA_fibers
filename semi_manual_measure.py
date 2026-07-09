@@ -36,6 +36,9 @@ def main():
     if input_dir is None:
         return
     
+    IJ.run("Set Measurements...", "display decimal=3")
+
+    
     # Find the following substrings in the filenames: "_merged.png" and "_chromatin.png"
     substring_1 = "_merged.png"
     substring_2 = "_chromatin.png"
@@ -81,7 +84,13 @@ def main():
         count = 0
             
         while count < 2:
+            # Clear ROI Manager and Results table
             clear_results_and_rois()
+            
+            # Open ROI Manager if not already open
+            rm = RoiManager.getInstance()
+            if rm is None:
+                rm = RoiManager()
 
             # Ask what will be measured
             gd = GenericDialog("Measurement type")
@@ -119,8 +128,11 @@ def main():
                     )
             ).show()
             
-            # Save Results table
+            
+            # Show results table and run measurement command
             rt = ResultsTable.getResultsTable()
+            rt.show("Results")
+            rm.runCommand(imp_1, "Measure")
                 
             if rt.size() > 0:
                 folder_name = os.path.basename(root)
