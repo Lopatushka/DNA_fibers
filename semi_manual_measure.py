@@ -128,10 +128,9 @@ def main():
                     )
             ).show()
             
-            
             # Show results table and run measurement command
             rt = ResultsTable.getResultsTable()
-            rt.show("Results")
+            #rt.show("Results")
             rm.runCommand(imp_1, "Measure")
                 
             if rt.size() > 0:
@@ -151,12 +150,8 @@ def main():
         close_image(imp_1)
         close_image(imp_2)
         
-    # After analysis is complete, close Roi Manager and Results Table
-    results = WindowManager.getWindow("Results")
-    if results is not None:
-        results.close()
-
     # Close ROI Manager
+    rm = RoiManager.getInstance()
     if rm is not None:
         rm.close()
         
