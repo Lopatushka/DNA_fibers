@@ -78,10 +78,10 @@ def main():
             
             if rt.size() > 0:
                 folder_name = os.path.basename(root)
-                save_path = os.path.join(root, folder_name + "_measurements.csv")
+                save_path = os.path.join(root, folder_name + "_" + measurement_type + ".csv")
 
                 rt.save(save_path)
-                IJ.log("Saved measurements: {}".format(save_path))
+                IJ.log("Saved {} measurements: {}".format(measurement_type, save_path))
             else:
                 IJ.log("Skipped: no measurements for {}".format(root))
 
