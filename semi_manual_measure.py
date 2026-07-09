@@ -75,12 +75,23 @@ def main():
         if imp_1 is None or imp_2 is None:
             IJ.log("Cannot open images.")
             continue
-        
+                
         n_files += 1
         IJ.log("Processing image pair {}: {}".format(n_files, root))
         
         imp_1.show()
         imp_2.show()
+        
+        # Location of images on the screen
+        win1 = imp_1.getWindow()
+        win2 = imp_2.getWindow()
+
+        win1.setLocation(20, 50)
+
+        x = win1.getX() + win1.getWidth() + 20
+        y = win1.getY()
+
+        win2.setLocation(x, y)
         
         # ---------------------------------
         # Measurements
