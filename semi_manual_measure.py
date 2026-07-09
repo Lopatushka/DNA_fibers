@@ -150,6 +150,10 @@ def main():
         # Close images only after user skips/cancels this image pair
         close_image(imp_1)
         close_image(imp_2)
-
+        
+    # After analysis is complete, close Roi Manager and Results Table
+    rt.close()
+    rm.close()
+        
 if __name__ == "__main__":
     main()
