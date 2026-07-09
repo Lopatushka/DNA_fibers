@@ -45,7 +45,8 @@ def main():
                 imp_2.show()
                 
             # Repeat measurements for the same image pair
-            while True:
+            count = 0
+            while count < 2:
 
                 # Clear previous measurements
                 IJ.run("Clear Results")
@@ -54,24 +55,24 @@ def main():
                 gd = GenericDialog("Measurement type")
                 gd.addChoice(
                     "Measure:",
-                    ["Fiber length", "Interorigin distance", "Skip this image", "Stop analysis"],
+                    ["Fiber length", "Interorigin distance", "Next", "Stop analysis"],
                     "Fiber length"
                 )
 
                 gd.showDialog()
 
                 if gd.wasCanceled():
-                    measurement_type = "Skip this image"
+                    measurement_type = "Next"
                 else:
                     measurement_type = gd.getNextChoice()
 
                 # Skip pair and go to next folder
-                if measurement_type == "Skip this image":
-                    IJ.log("Skipped image pair: {}".format(root))
+                if measurement_type == "Next":
+                    IJ.log("Moving to next image pair: {}".format(root))
                     break
             
                 # Stop analysis
-                if measurement_type == "Stop analysis":
+                elif measurement_type == "Stop analysis":
                     IJ.log("Analysis stopped by user.")
                     # Close all opened images
                     for wid in WindowManager.getIDList() or []:
@@ -79,14 +80,16 @@ def main():
                     return
             
                 # Wait for user
-                WaitForUserDialog(
-                    "Manual measurements",
-                    "Measure: {}\n\n"
-                    "Click OK to save these results.\n"
-                    "You will then be asked again for another measurement type.".format(
-                        measurement_type
-                    )
-                ).show()
+                else:
+                    count += 1
+                    WaitForUserDialog(
+                        "Manual measurements",
+                        "Measure: {}\n\n"
+                        "Click OK to save these results.\n"
+                        "You will then be asked again for another measurement type.".format(
+                            measurement_type
+                        )
+                    ).show()
             
                 # Save Results table
                 rt = ResultsTable.getResultsTable()
