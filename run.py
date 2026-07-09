@@ -53,17 +53,18 @@ def main():
         )
         IJ.log(msg)
         
+        # Get pixel size
         cal = imp.getCalibration()
         if cal.scaled():
-            IJ.log("Image is calibrated.")
-
-    #pixel_width = cal.pixelWidth
-    #pixel_height = cal.pixelHeight
-    #pixel_depth = cal.pixelDepth
-
-    #unit = cal.getUnit()
-
-    #print(pixel_width, pixel_height, pixel_depth, unit)
+            pixel_width = cal.pixelWidth
+            pixel_height = cal.pixelHeight
+            unit = cal.getUnit()
+            
+            IJ.log("Pixel size: {} x {} {}".format(
+            pixel_width,
+            pixel_height,
+            unit
+            ))
 
 
 if __name__ == "__main__":
