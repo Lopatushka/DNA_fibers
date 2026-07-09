@@ -86,59 +86,70 @@ def main():
             unit
             ))
         
-    # Split image and acess them individually    
-    channels = ChannelSplitter.split(imp)
-    c1 = channels[0] # fibers 1, red
-    c2 = channels[1] # fibers 1, green
-    c3 = channels[2] # chromatin
-    
-    # --- Adjust LUT ---
-    c3.setActivated()
-    IJ.run(c3, "Grays", "")
-    
-    # --- Automatic brightness/contrast ---
-    ce = ContrastEnhancer()
-    
-    # channel 1, red
-    ce.stretchHistogram(c1, 0.55)
-    c1.updateAndDraw()
-    
-    # channel 2, green
-    ce.stretchHistogram(c2, 0.65)
-    c2.updateAndDraw()
-    
-    # channel 3, grey
-    ce.stretchHistogram(c3, 0.35)
-    c3.updateAndDraw()
-    
-    # --- Changes names of splitted images ---
-    c1.setTitle("{}_fibers1_red".format(imp_name))
-    c2.setTitle("{}_fibers1_green".format(imp_name))
-    
-    c3.setTitle("{}_chromatin".format(imp_name))
-    c3.show()
-    #for i, ch in enumerate(channels, start=1):
-        #ch.show()
+        # Split image and acess them individually    
+        channels = ChannelSplitter.split(imp)
+        c1 = channels[0] # fibers 1, red
+        c2 = channels[1] # fibers 1, green
+        c3 = channels[2] # chromatin
         
-    # Put C1 into the red channel and C2 into the green channel
-    rgb = RGBStackMerge.mergeChannels([c1, c2, None, None, None, None, None], False)
-    # Convert Composite/Stack -> RGB
-    ImageConverter(rgb).convertToRGB()
+        # --- Adjust LUT ---
+        c3.setActivated()
+        IJ.run(c3, "Grays", "")
+        IJ.run(c3, "RGB Color", "")
+        
+        # --- Automatic brightness/contrast ---
+        ce = ContrastEnhancer()
+        
+        # channel 1, red
+        ce.stretchHistogram(c1, 0.55)
+        c1.updateAndDraw()
+        
+        # channel 2, green
+        ce.stretchHistogram(c2, 0.65)
+        c2.updateAndDraw()
+        
+        # channel 3, grey
+        ce.stretchHistogram(c3, 0.15)
+        c3.updateAndDraw()
+        
+        # --- Changes names of splitted images ---
+        c1.setTitle("{}_fibers1_red".format(imp_name))
+        c2.setTitle("{}_fibers1_green".format(imp_name))
+        
+        c3.setTitle("{}_chromatin".format(imp_name))
+        #c3.show()
+        #for i, ch in enumerate(channels, start=1):
+            #ch.show()
+            
+        # Put C1 into the red channel and C2 into the green channel
+        rgb = RGBStackMerge.mergeChannels([c1, c2, None, None, None, None, None], False)
+        # Convert Composite/Stack -> RGB
+        ImageConverter(rgb).convertToRGB()
 
-    rgb.setTitle("{}_merged".format(imp_name))
-    rgb.show()
-    
-    # Create new directory for each image and save data
-    save_dir = os.path.join(output_dir, imp_name)
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-    
-    save_imp(rgb, "png", save_dir)
-    save_imp(c1, "png", save_dir)
-    save_imp(c2, "png", save_dir)
-    save_imp(c3, "png", save_dir)
+        rgb.setTitle("{}_merged".format(imp_name))
+        #rgb.show()
+        
+        # Create new directory for each image and save data
+        save_dir = os.path.join(output_dir, imp_name)
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        
+        save_imp(rgb, "png", save_dir)
+        save_imp(c1, "png", save_dir)
+        save_imp(c2, "png", save_dir)
+        save_imp(c3, "png", save_dir)
 
-    IJ.log("Images are saved in {}".format(save_dir))
+        IJ.log("Images are saved in {}".format(save_dir))
+        
+        # Close images
+        for ch in channels:
+            ch.close()
+        rgb.close()
+
+    # Check what images are opened
+    ids = WindowManager.getIDList() or []
+    print("Open images:", len(ids))
+    
     
 
 if __name__ == "__main__":
