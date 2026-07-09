@@ -134,8 +134,9 @@ def main():
             rm.runCommand(imp_1, "Measure")
                 
             if rt.size() > 0:
-                folder_name = os.path.basename(root)
-                save_path = os.path.join(root, folder_name + "_" + measurement_type + ".csv")
+                name = os.path.basename(root)
+                #name = os.path.basename(filename_low).split(substring_1)[0]
+                save_path = os.path.join(root, name + "_" + measurement_type + ".csv")
 
                 rt.save(save_path)
                 IJ.log("Saved {} measurements: {}".format(measurement_type, save_path))
@@ -149,11 +150,6 @@ def main():
         # Close images only after user skips/cancels this image pair
         close_image(imp_1)
         close_image(imp_2)
-        
-    # Close ROI Manager
-    win = WindowManager.getWindow("ROI Manager")
-    if win is not None:
-        win.close()
         
 if __name__ == "__main__":
     main()
