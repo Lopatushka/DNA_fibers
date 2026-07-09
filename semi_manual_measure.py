@@ -1,6 +1,7 @@
 from ij import IJ, WindowManager
 from ij.gui import WaitForUserDialog, GenericDialog
 from ij.measure import ResultsTable
+from ij.plugin.frame import RoiManager
 import os
 
 # ---------------------------------
@@ -48,8 +49,13 @@ def main():
             count = 0
             while count < 2:
 
-                # Clear previous measurements
+                # Clear previous measurements in Results table
                 IJ.run("Clear Results")
+                
+                # Clear ROI Manager
+                rm = RoiManager.getInstance()
+                if rm is not None:
+                    rm.reset()
             
                 # Ask what will be measured
                 gd = GenericDialog("Measurement type")
@@ -100,6 +106,7 @@ def main():
 
                         rt.save(save_path)
                         IJ.log("Saved {} measurements: {}".format(measurement_type, save_path))
+                        
                     else:
                         IJ.log("No measurements made for {} in {}".format(
                             measurement_type,
