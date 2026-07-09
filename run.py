@@ -130,7 +130,8 @@ def main():
     
     # Create new directory for each image and save data
     save_dir = os.path.join(output_dir, imp_name)
-    os.makedirs(save_dir, exist_ok=True)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
     
     save_imp(rgb, "png", save_dir)
     save_imp(c1, "png", save_dir)
