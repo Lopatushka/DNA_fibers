@@ -135,7 +135,6 @@ def main():
             
             # Show results table and run measurement command
             rt = ResultsTable.getResultsTable()
-            #rt.show("Results")
             rm.runCommand(imp_1, "Measure")
                 
             if rt.size() > 0:
