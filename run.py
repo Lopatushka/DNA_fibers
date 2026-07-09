@@ -46,11 +46,12 @@ def main():
     # Iterate through all unique images
     # ---------------------------------
     for call_id, imp in enumerate(unique_images, start=1):
+        imp_name = imp.getTitle()
         # Make Log message
         msg = "Processing image {}/{}: {}".format(
             call_id,
             n,
-            imp.getTitle()
+            imp_name
         )
         IJ.log(msg)
         
@@ -92,17 +93,18 @@ def main():
     ce.stretchHistogram(c3, 0.35)
     c3.updateAndDraw()
     
-
     # --- Show splitted images in FIJI --- 
-    for i, ch in enumerate(channels, start=1):
-        ch.show()
+    c3.setTitle("{}_chromatin".format(imp_name))
+    c3.show()
+    #for i, ch in enumerate(channels, start=1):
+        #ch.show()
         
     # Put C1 into the red channel and C2 into the green channel
     rgb = RGBStackMerge.mergeChannels([c1, c2, None, None, None, None, None], False)
     # Convert Composite/Stack -> RGB
     ImageConverter(rgb).convertToRGB()
 
-    rgb.setTitle("Merged")
+    rgb.setTitle("{}_merged".format(imp_name))
     rgb.show()
     
     
