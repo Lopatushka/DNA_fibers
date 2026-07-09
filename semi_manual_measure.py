@@ -151,9 +151,9 @@ def main():
         close_image(imp_2)
         
     # Close ROI Manager
-    rm = RoiManager.getInstance()
-    if rm is not None:
-        rm.runCommand("Close")
+    win = WindowManager.getWindow("ROI Manager")
+    if win is not None:
+        win.close()
         
 if __name__ == "__main__":
     main()
