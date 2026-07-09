@@ -1,4 +1,4 @@
-from ij import IJ
+from ij import IJ, WindowManager
 from ij.gui import WaitForUserDialog, GenericDialog
 from ij.measure import ResultsTable
 import os
@@ -73,6 +73,9 @@ def main():
                 # Stop analysis
                 if measurement_type == "Stop analysis":
                     IJ.log("Analysis stopped by user.")
+                    # Close all opened images
+                    for wid in WindowManager.getIDList() or []:
+                        WindowManager.getImage(wid).close()
                     return
             
                 # Wait for user
