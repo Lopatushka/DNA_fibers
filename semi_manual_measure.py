@@ -151,14 +151,20 @@ def main():
             # Add column
             for row in range(rt.size()):
                 rt.setValue("Measurement_type", row, measurement_type.replace(" ", "_"))
-                
+            
+            # Save Results table if is not empty    
             if rt.size() > 0:
                 name = os.path.basename(root)
                 #name = os.path.basename(filename_low).split(substring_1)[0]
-                save_path = os.path.join(root, name + "_" + measurement_type + ".csv")
+                save_path_rt = os.path.join(root, name + "_" + measurement_type + ".csv")
 
-                rt.save(save_path)
-                IJ.log("Saved {} measurements: {}".format(measurement_type, save_path))
+                rt.save(save_path_rt)
+                IJ.log("Saved {} measurements: {}".format(measurement_type, save_path_rt))
+            
+            if rm is not None and rm.getCount() > 0:
+                save_path_rm = os.path.join(root, name + "_" + measurement_type + ".zip")
+                rm.save(save_path_rm)
+                IJ.log("Saved {} ROIs: {}".format(measurement_type, save_path_rm))
                         
             else:
                 IJ.log("No measurements made for {} in {}".format(
