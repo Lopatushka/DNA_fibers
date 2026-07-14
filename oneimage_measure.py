@@ -88,6 +88,83 @@ def main():
     # ---------------------------------
     # Measurements
     # ---------------------------------
+    count = 0
+            
+    while count < 2:
+            # Clear ROI Manager and Results table
+            clear_results_and_rois()
+            
+            # Open ROI Manager if not already open
+            rm = RoiManager.getInstance()
+            if rm is None:
+                rm = RoiManager()
+
+            # Ask what will be measured
+            gd = GenericDialog("Measurement type")
+            gd.addChoice(
+                    "Measure:",
+                    ["Fiber length", "Interorigin distance", "Stop analysis"],
+                    "Interorigin distance"
+            )
+            gd.showDialog()
+
+            if gd.wasCanceled():
+                measurement_type = "Stop analysis"
+            
+            # Stop analysis
+            elif measurement_type == "Stop analysis":
+                IJ.log("Analysis stopped by user.")
+                close_all_images()
+                return
+            
+            else:
+                measurement_type = gd.getNextChoice()
+            
+            count += 1
+                
+            WaitForUserDialog(
+                    "Manual measurements",
+                    "Measure: {}\n\n"
+                    "Click OK to save these results.\n"
+                    "You will then be asked again for another measurement type.".format(
+                        measurement_type
+                    )
+            ).show()
+            
+            # Show results table and run measurement command
+            rt = ResultsTable.getResultsTable()
+            rm.runCommand(imp_1, "Measure")
+            
+            # Add column
+            for row in range(rt.size()):
+                rt.setValue("Measurement_type", row, measurement_type.replace(" ", "_"))
+            
+            # Save Results table if is not empty    
+            if rt.size() > 0:
+                name = os.path.basename(input_dir)
+                save_path_rt = os.path.join(input_dir, name + "_" + measurement_type + ".csv")
+                if os.path.isfile(save_path_rt):
+                    IJ.log("File with measurements of {} will be replaced: {}".format(measurement_type, save_path_rt))
+                else:
+                    IJ.log("Saved {} measurements: {}".format(measurement_type, save_path_rt))
+
+                rt.save(save_path_rt)
+                
+            
+            if rm is not None and rm.getCount() > 0:
+                save_path_rm = os.path.join(input_dir, name + "_" + measurement_type + ".zip")
+                rm.save(save_path_rm)
+                IJ.log("Saved {} ROIs: {}".format(measurement_type, save_path_rm))
+                        
+            else:
+                IJ.log("No measurements made for {} in {}".format(
+                    measurement_type,
+                    input_dir
+                ))
+
+        # Close images only after user skips/cancels this image pair
+        close_image(imp_1)
+        close_image(imp_2)
     
     # Clear ROI Manager and Results table at the end
     #clear_results_and_rois()
