@@ -95,11 +95,6 @@ def main():
     while count < 2:
             # Clear ROI Manager and Results table
             clear_results_and_rois()
-            
-            # Open ROI Manager if not already open
-            rm = RoiManager.getInstance()
-            if rm is None:
-                rm = RoiManager()
 
             # Ask what will be measured
             gd = GenericDialog("Measurement type")
@@ -117,6 +112,11 @@ def main():
             
             else:
                 measurement_type = gd.getNextChoice()
+            
+            # Open ROI Manager if not already open
+            rm = RoiManager.getInstance()
+            if rm is None:
+                rm = RoiManager()
             
             count += 1
                 
