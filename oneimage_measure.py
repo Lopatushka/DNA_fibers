@@ -105,16 +105,12 @@ def main():
             gd = GenericDialog("Measurement type")
             gd.addChoice(
                     "Measure:",
-                    ["Fiber length", "Interorigin distance", "Stop analysis"],
+                    ["Fiber length", "Interorigin distance"],
                     "Interorigin distance"
             )
             gd.showDialog()
 
             if gd.wasCanceled():
-                measurement_type = "Stop analysis"
-            
-            # Stop analysis
-            if measurement_type == "Stop analysis":
                 IJ.log("Analysis stopped by user.")
                 close_all_images()
                 return
