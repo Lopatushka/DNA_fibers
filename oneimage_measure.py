@@ -85,6 +85,8 @@ def main():
 
     win2.setLocation(x, y)
     
+    IJ.log("Processing image pair from the folder: {}".format(input_dir))
+    
     # ---------------------------------
     # Measurements
     # ---------------------------------
@@ -150,6 +152,9 @@ def main():
 
                 rt.save(save_path_rt)
                 
+            else:
+                IJ.log("There is no measurements of {} to save".format(measurement_type))
+                
             
             if rm is not None and rm.getCount() > 0:
                 save_path_rm = os.path.join(input_dir, name + "_" + measurement_type + ".zip")
@@ -157,7 +162,7 @@ def main():
                 IJ.log("Saved {} ROIs: {}".format(measurement_type, save_path_rm))
                         
             else:
-                IJ.log("No measurements made for {} in {}".format(
+                IJ.log("No measurements were maden for {} in {}".format(
                     measurement_type,
                     input_dir
                 ))
