@@ -104,7 +104,7 @@ def main():
             gd.addChoice(
                     "Measure:",
                     ["Fiber length", "Interorigin distance"],
-                    "Interorigin distance"
+                    "Fiber length"
             )
             gd.showDialog()
 
@@ -144,7 +144,7 @@ def main():
             if rt.size() > 0:
                 #name = os.path.basename(input_dir)
                 save_path_rt = os.path.join(input_dir, name + "_" + measurement_type + ".csv")
-                if os.path.isfile(save_path_rt):
+                if os.path.exists(save_path_rt):
                     IJ.log("File with measurements of {} will be replaced: {}".format(measurement_type, save_path_rt))
                 else:
                     IJ.log("Saved {} measurements: {}".format(measurement_type, save_path_rt))
@@ -157,7 +157,7 @@ def main():
             # Save ROI manager if needed
             if rm is not None and rm.getCount() > 0:
                 save_path_rm = os.path.join(input_dir, name + "_" + measurement_type + ".zip")
-                if os.path.isfile(save_path_rt):
+                if os.path.exists(save_path_rt):
                      IJ.log("File with ROIs of {} will be replaced: {}".format(measurement_type, save_path_rt))
                 else:
                     IJ.log("Saved {} ROIs: {}".format(measurement_type, save_path_rm))
