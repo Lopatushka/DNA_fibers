@@ -154,9 +154,13 @@ def main():
             # Save ROI manager if needed
             if rm is not None and rm.getCount() > 0:
                 save_path_rm = os.path.join(input_dir, name + "_" + measurement_type + ".zip")
+                if os.path.isfile(save_path_rt):
+                     IJ.log("File with ROIs of {} will be replaced: {}".format(measurement_type, save_path_rt))
+                else:
+                    IJ.log("Saved {} ROIs: {}".format(measurement_type, save_path_rm))
+                    
                 rm.save(save_path_rm)
-                IJ.log("Saved {} ROIs: {}".format(measurement_type, save_path_rm))
-                        
+                     
             else:
                 IJ.log("No measurements of {} were maden in {}".format(
                     measurement_type,
