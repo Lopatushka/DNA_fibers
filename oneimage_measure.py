@@ -32,9 +32,12 @@ def safe_name(text):
 # ---------------------------------
 def main():
     # Ask user about the folder with data
-    input_dir = IJ.getDirectory("Choose a directory with data to analyze")
+    input_dir = os.path.normpath(IJ.getDirectory("Choose a directory with data to analyze"))
     if input_dir is None:
         return
+    
+    # The name of input folder itself
+    name = os.path.basename(input_dir)
     
     IJ.run("Set Measurements...", "display decimal=3")
 
@@ -139,7 +142,7 @@ def main():
             
             # Save Results table if is not empty    
             if rt.size() > 0:
-                name = os.path.basename(input_dir)
+                #name = os.path.basename(input_dir)
                 save_path_rt = os.path.join(input_dir, name + "_" + measurement_type + ".csv")
                 if os.path.isfile(save_path_rt):
                     IJ.log("File with measurements of {} will be replaced: {}".format(measurement_type, save_path_rt))
