@@ -43,16 +43,30 @@ def add_bracket(ax, x1, x2, y, height, text):
     )
 
 
-def boxplot_with_statistics():
-    # -------------------------------------------------------
+def boxplot_with_statistics(data_plot,
+                            sample_order,
+                            var,
+                            stats_plot,
+                            y_axis = "",
+                            save_dir = ".",
+                            save_name = "",
+                            ext = "png"):
     # Create figure
-    # -------------------------------------------------------
     fig, ax = plt.subplots(figsize=(9, 6))
-        
-    # -------------------------------------------------------
-    # Draw boxplot
-    # -------------------------------------------------------
-
+    
+    # Prepare groups and labeles
+    groups = []
+    labels = []
+    
+    for sample in sample_order:
+        values = data_plot.loc[
+        data_plot["Sample_name"] == sample,
+        var
+    ]
+        groups.append(values)
+        labels.append(sample)
+    
+   # Draw boxplot
     bp = plt.boxplot(
         groups,
         patch_artist=True,
@@ -178,7 +192,7 @@ def boxplot_with_statistics():
     # -------------------------------------------------------
     # Save figure
     # -------------------------------------------------------
-    output_file = f"{OUTPUT_DIR}/{save_name}"
+    output_file = f"{save_dir}/{save_name}.{ext}"
 
     fig.savefig(
         output_file,
