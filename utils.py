@@ -53,3 +53,7 @@ def load_data(dir, pixel_size=1):
     ]
     
     return data
+
+
+def data_subset(df, measurement_type):
+    return df[df['Measurement_type']==measurement_type]
