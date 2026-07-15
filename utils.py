@@ -57,3 +57,36 @@ def load_data(dir, pixel_size=1):
 
 def data_subset(df, measurement_type):
     return df[df['Measurement_type']==measurement_type]
+
+def speed_processing(df, conversion_factor, time):
+    # Checking speed file
+    counts = df.groupby("File").size()
+    odd_files = counts[counts % 2 != 0].index.tolist()
+
+    if len(odd_files) == 0:
+        print("All files contain an even number of fibers.")
+    else:
+        print("The following files contain an odd number of fibers will be removed:")
+        print(*odd_files, sep="\n")
+        
+        # Removing odd files from speed dataframe
+        df = df[~df["File"].isin(odd_files)].copy()
+        
+    # Add extra inedex to group pairs of files
+    df["Index"] = df.groupby("File").cumcount() // 2
+
+    # Calculate sum of fiber length in pairs
+    df_processed = df.groupby(["File", "Index"], as_index=False).agg(
+            Total_Length=("Length", "sum"),
+            ROI=("ROI", list),
+            Path=("Path", "first"),
+            Sample_name=("Sample_name", "first")
+            )
+
+    # Convert speed to kb/min
+    df_processed['Speed_kb_min'] = df_processed['Total_Length'].apply(lambda x: x * conversion_factor / time)
+
+    # Delete extra columns
+    final = df_processed[['Sample_name', 'File', 'Speed_kb_min', 'ROI', 'Path']]
+    
+    return final
