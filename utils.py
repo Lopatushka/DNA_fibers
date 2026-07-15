@@ -90,3 +90,8 @@ def speed_processing(df, conversion_factor, time):
     final = df_processed[['Sample_name', 'File', 'Speed_kb_min', 'ROI', 'Path']]
     
     return final
+
+def iod_processing(df, conversion_factor):
+    df['IOD_kb'] = df['Length'].apply(lambda x: x * conversion_factor)
+    df = df[["Sample_name", "File", 'IOD_kb', 'ROI', 'Path']]
+    return df
