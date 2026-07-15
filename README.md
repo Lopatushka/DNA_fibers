@@ -78,11 +78,7 @@ input/
 └── ...
 ```
 
-The CSV files should contain measurements including:
-
-- Label
-- Length
-- Measurement_type
+The example of appropriate CSV files see in the `examples` folder:
 
 ---
 
