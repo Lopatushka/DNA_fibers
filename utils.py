@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
+from scipy.stats import mannwhitneyu
 
 def load_data(dir, pixel_size=1):
     dfs = []
@@ -113,5 +114,44 @@ def outliers(df, col, q1=0.25, q2=0.75):
     upper = Q3 + 1.5 * IQR
 
     final = df[(df[col] < lower) | (df[col] > upper)]
+    
+    return final
+
+def u_test(df, col, control_sample):
+    # Subset of control data to compare with
+    control_df = df.loc[
+        df["Sample_name"] == control_sample,
+        col
+    ].dropna()
+
+    experimental_samples = set(df["Sample_name"]) - {control_sample}
+
+    results = []
+
+    # Iteration through the experimental samples
+    for sample in experimental_samples:
+        # Subset of experimental sample
+        sample_df = df.loc[
+        df["Sample_name"] == sample,
+        col
+        ].dropna()
+        
+        # Statistics calculation
+        stat, p = mannwhitneyu(
+        control_df,
+        sample_df
+        )
+        
+        results.append({
+        "Group_1": control_sample,
+        "Group_2": sample,
+        "Group_1_n": len(control_df),
+        "Group_2_n": len(sample_df),
+        "U": stat,
+        "p-value": p,
+        })
+
+    # Convert data into dataframe
+    final = pd.DataFrame(results)
     
     return final
