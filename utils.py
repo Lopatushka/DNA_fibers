@@ -95,3 +95,11 @@ def iod_processing(df, conversion_factor):
     df['IOD_kb'] = df['Length'].apply(lambda x: x * conversion_factor)
     df = df[["Sample_name", "File", 'IOD_kb', 'ROI', 'Path']]
     return df
+
+def description_stats(df, col):
+    return df.groupby("Sample_name")[col].agg(
+        Count="count",
+        Mean="mean",
+        Median="median",
+        SD="std",
+    )
