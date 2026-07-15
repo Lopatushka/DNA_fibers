@@ -155,3 +155,6 @@ def u_test(df, col, control_sample):
     final = pd.DataFrame(results)
     
     return final
+
+def table_export(df, dir, filename):
+    df.to_excel(f"{dir}/{filename}", index=False)
