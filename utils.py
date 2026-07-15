@@ -103,3 +103,15 @@ def description_stats(df, col):
         Median="median",
         SD="std",
     )
+    
+def outliers(df, col, q1=0.25, q2=0.75):
+    Q1 = df[col].quantile(q1)
+    Q3 = df[col].quantile(q2)
+    IQR = Q3 - Q1
+
+    lower = Q1 - 1.5 * IQR
+    upper = Q3 + 1.5 * IQR
+
+    final = df[(df[col] < lower) | (df[col] > upper)]
+    
+    return final
