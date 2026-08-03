@@ -84,10 +84,12 @@ The example of appropriate CSV files see in the `examples` folder:
 
 ## Workflow
 
-1. Run `manual_measure.py` script for Fiji/ImageJ to create the measurements of Inter-origin distance and fiber length.
-2. Set the pixel size and experimental parameters in `notebook_stats.ipynb`.
-3. Run the notebook from top to bottom.
-4. The notebook will:
+1. Run `preprocess.py` script for Fiji/ImageJ to split channels and enhance the brightness/contrast.
+2. Run `manual_measure.py` script for Fiji/ImageJ to create the measurements of Inter-origin distance and fiber length.
+3. Set the *pixel size* and experimental parameters in `notebook_stats.ipynb`.
+4. Customize the parsing of *data* dataframe to create the *Sample* column.
+5. Run the notebook from top to bottom.
+5. The notebook will:
    - load all measurements,
    - calculate replication parameters,
    - perform statistical analysis,
