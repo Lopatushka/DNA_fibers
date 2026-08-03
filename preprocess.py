@@ -3,6 +3,7 @@ from loci.plugins import BF
 from loci.formats import FormatException
 from ij.plugin import ChannelSplitter, ContrastEnhancer, RGBStackMerge
 from ij.process import ImageConverter
+from ij.gui import GenericDialog
 import os
 
 
@@ -77,6 +78,25 @@ def main():
         IJ.error("No output directory is selected!")
         return
     
+    # Create dialog
+    gd = GenericDialog("Brightness/Contrast Settings")
+
+    gd.addNumericField("Red channel:", 0.65, 2)
+    gd.addNumericField("Green channel:", 0.65, 2)
+    gd.addNumericField("White channel:", 0.15, 2)
+    
+    gd.showDialog()
+    
+    # User clicked Cancel
+    if gd.wasCanceled():
+        IJ.log("Analysis canceled by user.")
+        IJ.run("Close All") # close all images
+        return
+    
+    red_contrast = gd.getNextNumber()
+    green_contrast = gd.getNextNumber()
+    white_contrast = gd.getNextNumber()
+    
     # Keep only unique images
     unique_images = sorted(list(set(images)))
     n = len(unique_images) # total amount of images to process
@@ -109,6 +129,10 @@ def main():
         
         # Split image and acess them individually    
         channels = ChannelSplitter.split(imp)
+        if len(channels) != 3:
+            IJ.log("Image {} does not have 3 channels!".format(imp_name))
+            continue
+            
         c1 = channels[0] # fibers 1, red
         c2 = channels[1] # fibers 1, green
         c3 = channels[2] # chromatin
@@ -122,15 +146,15 @@ def main():
         ce = ContrastEnhancer()
         
         # channel 1, red
-        ce.stretchHistogram(c1, 0.65)
+        ce.stretchHistogram(c1, red_contrast)
         c1.updateAndDraw()
         
         # channel 2, green
-        ce.stretchHistogram(c2, 0.65)
+        ce.stretchHistogram(c2, green_contrast)
         c2.updateAndDraw()
         
         # channel 3, grey
-        ce.stretchHistogram(c3, 0.15)
+        ce.stretchHistogram(c3, white_contrast)
         c3.updateAndDraw()
         
         # --- Changes names of splitted images ---
