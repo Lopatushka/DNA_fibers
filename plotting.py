@@ -1,193 +1,208 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
-def p_to_stars(p_value):
-    # -------------------------------------------------------
-    # Convert p-values to significance stars
-    # -------------------------------------------------------
-    if pd.isna(p_value):
-        return ""
+# ---------------------------------------------------------
+# Function for significance bars
+# ---------------------------------------------------------
+def p_to_stars(p):
+    """
+    Convert a p-value to a significance label.
 
-    if p_value < 0.0001:
+    Parameters
+    ----------
+    p : float
+        P-value.
+
+    Returns
+    -------
+    str
+        One of: "ns", "*", "**", "***", "****".
+    """
+    if p < 0.0001:
         return "****"
-    elif p_value < 0.001:
+    elif p < 0.001:
         return "***"
-    elif p_value < 0.01:
+    elif p < 0.01:
         return "**"
-    elif p_value < 0.05:
+    elif p < 0.05:
         return "*"
     else:
-        return "ns"
-
-
-def add_bracket(ax, x1, x2, y, height, text):
-    # -------------------------------------------------------
-    # Function to draw one significance bracket
-    # -------------------------------------------------------
+        return "n.s."
+    
+def add_significance_bar(
+    ax,
+    x1,
+    x2,
+    y,
+    text,
+    bar_height=2,
+    text_offset=1,
+    linewidth=1.3,
+    fontsize=13
+):
     ax.plot(
         [x1, x1, x2, x2],
-        [y, y + height, y + height, y],
+        [y, y + bar_height, y + bar_height, y],
         color="black",
-        linewidth=1.2,
-        clip_on=False,
+        linewidth=linewidth,
+        clip_on=False
     )
 
     ax.text(
         (x1 + x2) / 2,
-        y + height,
+        y + bar_height + text_offset,
         text,
         ha="center",
         va="bottom",
-        fontsize=11,
+        fontsize=fontsize
     )
 
 
-def boxplot_with_statistics(data_plot,
+def boxplot_with_statistics(data,
+                            var, # "Sample_name", "IOD_kb"
                             sample_order,
-                            var,
-                            stats_plot,
+                            sample_labels,
+                            sample_colors,
+                            sample_markers,
+                            figsize = (4.5, 5.5),
+                            stats = ["n.s."], # "****", "n.s."
                             y_axis = "",
                             save_dir = ".",
                             save_name = "",
                             ext = "png"):
-    # Create figure
-    fig, ax = plt.subplots(figsize=(9, 6))
     
-    # Prepare groups and labeles
-    groups = []
-    labels = []
+    # ---------------------------------------------------------
+    # Process dataframe for plotting
+    # ---------------------------------------------------------
+    # Keep only the columns needed for plotting
+    plot_data = data[['Sample_name', var]].copy()
     
-    for sample in sample_order:
-        values = data_plot.loc[
-        data_plot["Sample_name"] == sample,
-        var
-    ]
-        groups.append(values)
-        labels.append(sample)
+    # Make sure IOD_kb is numeric
+    plot_data[var] = pd.to_numeric(
+        plot_data[var],
+        errors="coerce"
+    )
     
-   # Draw boxplot
-    bp = plt.boxplot(
-        groups,
-        patch_artist=True,
-        showfliers=False,
-        widths=0.6,
-        medianprops={
-            "color": "black",
-            "linewidth": 1.5,
-        },
-        whiskerprops={
-            "color": "black",
-            "linewidth": 1.2,
-        },
-        capprops={
-            "color": "black",
-            "linewidth": 1.2,
-        },
+    # Remove rows with missing values
+    plot_data = plot_data.dropna(
+        subset=["Sample_name", var]
     )
 
-    for box in bp["boxes"]:
-        box.set(
-            facecolor="#4C72B0",
-            alpha=0.6,
-            edgecolor="black",
-            linewidth=1.2,
-        )
+    # ---------------------------------------------------------
+    # Create plot
+    # ---------------------------------------------------------
+    x_positions = np.arange(len(sample_order))
+    fig, ax = plt.subplots(figsize=figsize)
+    rng = np.random.default_rng(4)
+    
+    # Iteration over samples to plot individual points and median lines
+    for x, sample in zip(x_positions, sample_order):
+        values = plot_data.loc[
+            plot_data["Sample_name"] == sample,
+            "IOD_kb"
+        ].to_numpy()
 
-    # -------------------------------------------------------
-    # Add jittered individual values
-    # -------------------------------------------------------
-    rng = np.random.default_rng(seed=42)
+        if len(values) == 0:
+            print("Warning: no values found for sample:", sample)
+            continue
 
-    for position, values in enumerate(groups, start=1):
-        x_jitter = rng.normal(
-            loc=position,
-            scale=0.05,
-            size=len(values),
+        # Horizontal jitter
+        jitter = rng.normal(
+            loc=0,
+            scale=0.08,
+            size=len(values)
         )
 
         ax.scatter(
-            x_jitter,
+            x + jitter,
             values,
             s=20,
-            color="black",
-            alpha=0.7,
-            zorder=3,
+            marker=sample_markers.get(sample, "o"),
+            color=sample_colors.get(sample, "gray"),
+            edgecolors="none",
+            alpha=0.9,
+            zorder=2
         )
 
-    # -------------------------------------------------------
-    # Add significance brackets
-    # -------------------------------------------------------
-    sample_positions = {
-        sample: position
-        for position, sample in enumerate(sample_order, start=1)
-    }
+        # Median line
+        median_value = np.median(values)
 
-    data_min = data_plot[var].min()
-    data_max = data_plot[var].max()
-    data_range = data_max - data_min
+        ax.plot(
+            [x - 0.24, x + 0.24],
+            [median_value, median_value],
+            color="red",
+            linewidth=2,
+            zorder=3
+        )
 
-    if data_range == 0:
-        data_range = 1
+    # ---------------------------------------------------------
+    # Add statistical annotation manually
+    # Adjust y according to your data
+    # ---------------------------------------------------------
+    max_value = plot_data.loc[
+            plot_data["Sample_name"].isin(sample_order),
+            var
+        ].max()
 
-    bracket_height = data_range * 0.025
-    bracket_step = data_range * 0.10
-    current_y = data_max + data_range * 0.08
+    annotation_y = max_value + 10
 
-    # Sort comparisons by distance between groups.
-    # Shorter brackets are drawn first.
-    stats_plot["span"] = stats_plot.apply(
-        lambda row: abs(
-            sample_positions[row["Group_2"]]
-            - sample_positions[row["Group_1"]]
-        ),
-        axis=1,
+    # Add significance bars for each comparison
+    for stat in stats:
+        add_significance_bar(
+            ax,
+            x1=stat["group1"],
+            x2=stat["group2"],
+            y=annotation_y,
+            text=p_to_stars(stat["p_value"]),
+        )
+
+    # ---------------------------------------------------------
+    # Axis formatting
+    # ---------------------------------------------------------
+    ax.set_xticks(x_positions)
+
+    ax.set_xticklabels(
+        [
+            sample_labels.get(sample, sample)
+            for sample in sample_order
+        ],
+        fontsize=13
     )
 
-    stats_plot = stats_plot.sort_values("span")
+    ax.set_ylabel(
+        y_axis,
+        fontsize=14
+    )
 
+    ax.set_xlim(-0.6, len(sample_order) - 0.4)
 
-    for _, row in stats_plot.iterrows():
-        group1 = row["Group_1"]
-        group2 = row["Group_2"]
-        p_value = row["p-value"]
+    ax.set_ylim(
+        0,
+        annotation_y + 15
+    )
 
-        x1 = sample_positions[group1]
-        x2 = sample_positions[group2]
+    ax.tick_params(
+        axis="y",
+        labelsize=12,
+        width=1.2,
+        length=7,
+        direction="out"
+    )
 
-        add_bracket(
-            ax=ax,
-            x1=x1,
-            x2=x2,
-            y=current_y,
-            height=bracket_height,
-            text=p_to_stars(p_value),
-        )
-
-        current_y += bracket_step
-
-    # -------------------------------------------------------
-    # Format axes
-    # -------------------------------------------------------
-    ax.set_ylabel(y_axis, fontsize=12)
-    ax.set_xlabel("")
-
-    ax.set_xticks(range(1, len(sample_order) + 1))
-    ax.set_xticklabels(sample_order)
-
-    plt.grid(axis="y", linestyle="--", alpha=0.4)
+    ax.tick_params(
+        axis="x",
+        width=1.2,
+        length=7,
+        direction="out",
+        pad=7
+    )
 
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
-    bottom_limit = data_min - data_range * 0.05
-    top_limit = current_y + bracket_step * 0.3
-    ax.set_ylim(
-        bottom=bottom_limit,
-        top=top_limit,
-    )
-
-    plt.tight_layout()
+    ax.spines["left"].set_linewidth(1.2)
+    ax.spines["bottom"].set_linewidth(1.2)  
 
     # -------------------------------------------------------
     # Save figure
@@ -201,5 +216,6 @@ def boxplot_with_statistics(data_plot,
     )
 
     print(f"Plot saved to: {output_file}")
-
+    
+    plt.tight_layout()
     plt.show()
