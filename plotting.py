@@ -65,16 +65,42 @@ def boxplot_with_statistics(data,
                             sample_labels,
                             sample_colors,
                             sample_markers,
-                            figsize = (4.5, 5.5),
-                            stats = ["n.s."], # "****", "n.s."
+                            figsize = (5, 6),
+                            stats = None,
                             y_axis = "",
                             save_dir = ".",
                             save_name = "",
                             ext = "png"):
     
+    """
+    Plot individual observations, median lines, and significance brackets.
+
+    stats should be a list of dictionaries, for example:
+
+    stats = [
+        {"group1": "NC", "group2": "Apt3", "p_value": 0.08},
+        {"group1": "NC", "group2": "Apt4", "p_value": 0.00001},
+    ]
+    """
+    
+    if stats is None:
+        stats = []
+
+
     # ---------------------------------------------------------
     # Process dataframe for plotting
     # ---------------------------------------------------------
+    required_columns = {"Sample_name", var}
+    
+    missing_columns = required_columns.difference(data.columns)
+
+    if missing_columns:
+        raise ValueError(
+            "Missing dataframe columns: {}".format(
+                ", ".join(sorted(missing_columns))
+            )
+        )
+        
     # Keep only the columns needed for plotting
     plot_data = data[['Sample_name', var]].copy()
     
@@ -88,19 +114,44 @@ def boxplot_with_statistics(data,
     plot_data = plot_data.dropna(
         subset=["Sample_name", var]
     )
+    
+    # Convert sample names to numeric x-axis positions
+    x_lookup = {
+        sample: i
+        for i, sample in enumerate(sample_order)
+    }
+    
+    # Check that all statistical groups are valid
+    for stat in stats:
+        group1 = stat["group1"]
+        group2 = stat["group2"]
+
+        if group1 not in x_lookup:
+            raise ValueError(
+                "Group '{}' is not present in sample_order.".format(group1)
+            )
+
+        if group2 not in x_lookup:
+            raise ValueError(
+                "Group '{}' is not present in sample_order.".format(group2)
+            )
+    
 
     # ---------------------------------------------------------
     # Create plot
     # ---------------------------------------------------------
     x_positions = np.arange(len(sample_order))
+    
     fig, ax = plt.subplots(figsize=figsize)
+    
     rng = np.random.default_rng(4)
     
     # Iteration over samples to plot individual points and median lines
     for x, sample in zip(x_positions, sample_order):
+        
         values = plot_data.loc[
             plot_data["Sample_name"] == sample,
-            "IOD_kb"
+            var,
         ].to_numpy()
 
         if len(values) == 0:
@@ -140,21 +191,48 @@ def boxplot_with_statistics(data,
     # Add statistical annotation manually
     # Adjust y according to your data
     # ---------------------------------------------------------
-    max_value = plot_data.loc[
-            plot_data["Sample_name"].isin(sample_order),
-            var
-        ].max()
+    selected_values = plot_data.loc[
+        plot_data["Sample_name"].isin(sample_order),
+        var,
+    ]
 
-    annotation_y = max_value + 10
+    if selected_values.empty:
+        raise ValueError("No data found for the selected samples.")
+    
+    data_min = selected_values.min()
+    data_max = selected_values.max()
+    data_range = data_max - data_min
 
-    # Add significance bars for each comparison
-    for stat in stats:
+    if data_range == 0:
+        data_range = max(abs(data_max), 1)
+
+    first_annotation_y = data_max + 0.08 * data_range
+    annotation_step = 0.12 * data_range
+    bar_height = 0.025 * data_range
+    text_offset = 0.015 * data_range
+    
+    
+    for i, stat in enumerate(stats):
+        group1 = stat["group1"]
+        group2 = stat["group2"]
+        p_value = stat["p_value"]
+        
+        
+        # Convert sample names to numeric positions
+        x1 = x_lookup[group1]
+        x2 = x_lookup[group2]
+        
+        label = p_to_stars(p_value)
+        
+        # Put each bracket at a different height
+        annotation_y = first_annotation_y + i * annotation_step
+             
         add_significance_bar(
             ax,
-            x1=stat["group1"],
-            x2=stat["group2"],
+            x1=x1,
+            x2=x2,
             y=annotation_y,
-            text=p_to_stars(stat["p_value"]),
+            text=label,
         )
 
     # ---------------------------------------------------------
@@ -177,10 +255,23 @@ def boxplot_with_statistics(data,
 
     ax.set_xlim(-0.6, len(sample_order) - 0.4)
 
+    if stats:
+        upper_limit = (
+                first_annotation_y
+                + len(stats) * annotation_step
+                + bar_height
+                + text_offset
+           )
+    else:
+        upper_limit = data_max + 0.1 * data_range
+
+    lower_limit = min(0, data_min - 0.05 * data_range)
+
     ax.set_ylim(
-        0,
-        annotation_y + 15
+        lower_limit,
+        upper_limit,
     )
+
 
     ax.tick_params(
         axis="y",
@@ -202,7 +293,10 @@ def boxplot_with_statistics(data,
     ax.spines["right"].set_visible(False)
 
     ax.spines["left"].set_linewidth(1.2)
-    ax.spines["bottom"].set_linewidth(1.2)  
+    ax.spines["bottom"].set_linewidth(1.2)
+    
+    # Apply layout before saving
+    fig.tight_layout()  
 
     # -------------------------------------------------------
     # Save figure
@@ -217,5 +311,6 @@ def boxplot_with_statistics(data,
 
     print(f"Plot saved to: {output_file}")
     
-    plt.tight_layout()
     plt.show()
+    
+    return fig, ax
