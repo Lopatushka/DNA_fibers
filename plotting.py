@@ -206,10 +206,10 @@ def boxplot_with_statistics(data,
     if data_range == 0:
         data_range = max(abs(data_max), 1)
 
-    first_annotation_y = data_max + 0.08 * data_range
-    annotation_step = 0.12 * data_range
-    bar_height = 0.025 * data_range
-    text_offset = 0.015 * data_range
+    first_annotation_y = data_max + 0.06 * data_range
+    annotation_step = 0.15 * data_range
+    bar_height = 0.035 * data_range
+    text_offset = 0.018 * data_range
     
     
     for i, stat in enumerate(stats):
@@ -232,7 +232,10 @@ def boxplot_with_statistics(data,
             x1=x1,
             x2=x2,
             y=annotation_y,
+            bar_height=bar_height,
             text=label,
+            linewidth=1.2,
+            fontsize=13
         )
 
     # ---------------------------------------------------------
