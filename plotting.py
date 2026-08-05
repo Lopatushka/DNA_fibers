@@ -233,6 +233,7 @@ def boxplot_with_statistics(data,
             x2=x2,
             y=annotation_y,
             bar_height=bar_height,
+            text_offset = text_offset,
             text=label,
             linewidth=1.2,
             fontsize=13
